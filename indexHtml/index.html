@@ -16,71 +16,91 @@
     <div class="notes-list" id="notesList"></div>
   </div>
 
-  <script>
-    let notes = [];
+<script>
+  let notes = [];
 
-    function renderNotes() {
-      const notesList = document.getElementById("notesList");
-      notesList.innerHTML = "";
-
-      notes.forEach((note, index) => {
-        const noteDiv = document.createElement("div");
-        noteDiv.className = "note" + (note.done ? " done" : "");
-        noteDiv.innerText = note.text;
-
-        const btnDiv = document.createElement("div");
-        btnDiv.className = "note-buttons";
-
-        const doneBtn = document.createElement("button");
-        doneBtn.innerText = "✓";
-        doneBtn.onclick = () => toggleDone(index);
-
-        const editBtn = document.createElement("button");
-        editBtn.innerText = "✎";
-        editBtn.onclick = () => editNote(index);
-
-        const delBtn = document.createElement("button");
-        delBtn.innerText = "✕";
-        delBtn.onclick = () => deleteNote(index);
-
-        btnDiv.appendChild(doneBtn);
-        btnDiv.appendChild(editBtn);
-        btnDiv.appendChild(delBtn);
-
-        noteDiv.appendChild(btnDiv);
-        notesList.appendChild(noteDiv);
-      });
+  // Загрузка из localStorage
+  function loadNotes() {
+    const saved = localStorage.getItem("notes");
+    if (saved) {
+      notes = JSON.parse(saved);
     }
+  }
 
-    function addNote() {
-      const input = document.getElementById("noteInput");
-      const text = input.value.trim();
-      if (text !== "") {
-        notes.push({ text, done: false });
-        input.value = "";
-        renderNotes();
-      }
-    }
+  // Сохранение в localStorage
+  function saveNotes() {
+    localStorage.setItem("notes", JSON.stringify(notes));
+  }
 
-    function deleteNote(index) {
-      notes.splice(index, 1);
+  function renderNotes() {
+    const notesList = document.getElementById("notesList");
+    notesList.innerHTML = "";
+
+    notes.forEach((note, index) => {
+      const noteDiv = document.createElement("div");
+      noteDiv.className = "note" + (note.done ? " done" : "");
+      noteDiv.innerText = note.text;
+
+      const btnDiv = document.createElement("div");
+      btnDiv.className = "note-buttons";
+
+      const doneBtn = document.createElement("button");
+      doneBtn.innerText = "✓";
+      doneBtn.onclick = () => toggleDone(index);
+
+      const editBtn = document.createElement("button");
+      editBtn.innerText = "✎";
+      editBtn.onclick = () => editNote(index);
+
+      const delBtn = document.createElement("button");
+      delBtn.innerText = "✕";
+      delBtn.onclick = () => deleteNote(index);
+
+      btnDiv.appendChild(doneBtn);
+      btnDiv.appendChild(editBtn);
+      btnDiv.appendChild(delBtn);
+
+      noteDiv.appendChild(btnDiv);
+      notesList.appendChild(noteDiv);
+    });
+  }
+
+  function addNote() {
+    const input = document.getElementById("noteInput");
+    const text = input.value.trim();
+    if (text !== "") {
+      notes.push({ text, done: false });
+      input.value = "";
+      saveNotes();
       renderNotes();
     }
+  }
 
-    function editNote(index) {
-      const newText = prompt("Редактировать заметку:", notes[index].text);
-      if (newText !== null && newText.trim() !== "") {
-        notes[index].text = newText.trim();
-        renderNotes();
-      }
-    }
-
-    function toggleDone(index) {
-      notes[index].done = !notes[index].done;
-      renderNotes();
-    }
-
+  function deleteNote(index) {
+    notes.splice(index, 1);
+    saveNotes();
     renderNotes();
-  </script>
+  }
+
+  function editNote(index) {
+    const newText = prompt("Редактировать заметку:", notes[index].text);
+    if (newText !== null && newText.trim() !== "") {
+      notes[index].text = newText.trim();
+      saveNotes();
+      renderNotes();
+    }
+  }
+
+  function toggleDone(index) {
+    notes[index].done = !notes[index].done;
+    saveNotes();
+    renderNotes();
+  }
+
+  // При старте страницы
+  loadNotes();
+  renderNotes();
+</script>
+
 </body>
 </html>
